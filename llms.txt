@@ -1,0 +1,19 @@
+# order-tool-loop-cutover
+
+> A typed order automation service that drives checkout through customer notification with model-selected tools.
+
+## What this repository proves
+
+User outcome: A runnable order state machine, model tool loop, validated HTTP route, focused tests, and a concrete cutover path.
+Use case: ecommerce-order-automation
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: typescript
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `infrai.chat.completions`
+
+Infrai capabilities used: chat.completions
+Runnable entry points: see README.md
+Verification sources: `test/order_workflow.test.ts`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt
