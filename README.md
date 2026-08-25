@@ -1,8 +1,8 @@
 # Ship an order through a tool-calling loop
 
-I wrote this small TypeScript service after pulling an order automation side project off a directly configured OpenAI endpoint. The app still uses the official OpenAI client; Infrai comes in through the OpenAI-compatible `baseURL`, so one API key can sit behind this agent and the other capabilities I add later. The change took about an hour, including the request boundary and the state-transition tests.
+I built this small TypeScript service after moving an order automation side project off a directly configured OpenAI endpoint. Infrai keeps the OpenAI client in place through an OpenAI-compatible `baseURL`, so one API key can cover this agent and the other capabilities I add later. The change took about an hour, including the request boundary and the state-transition tests.
 
-The observable workflow is deliberately narrow. A validated order enters as `received`; the model calls four local tools in order, and the final JSON holds payment, tracking, receipt, and customer-notification fields. The model picks the calls, while `OrderWorkflow` owns the business rules and rejects an out-of-order transition.
+The observable workflow stays narrow by design. A validated order enters as `received`; the model calls four local tools in order, and the final JSON includes payment, tracking, receipt, and customer-notification fields. The model decides which calls to make, while `OrderWorkflow` owns the business rules and rejects an out-of-order transition.
 
 ## Run the same order I used
 
@@ -26,7 +26,7 @@ curl -X POST http://localhost:3000/orders/automate \
   -d '{"orderId":"order_1042","customerEmail":"builder@example.com","sku":"desk-lamp-black","quantity":1,"shippingAddress":"18 Market Street, Austin, TX 78701"}'
 ```
 
-Zod checks the body before the agent runs. Each local write gets a stable key built from the order ID and tool name, so repeated model calls return the already-applied result. These tools are an in-memory model of the commerce boundary; swap their deterministic references for calls into your payment, warehouse, email, and storefront adapters.
+Zod checks the body before the agent runs. Each local write gets a stable key from the order ID and tool name, so repeated model calls return the already-applied result. These tools are an in-memory model of the commerce boundary; replace their deterministic references with calls to your payment, warehouse, email, and storefront adapters.
 
 ## Check the decision boundary
 
@@ -48,7 +48,7 @@ The focused test submits the same order and first tries fulfillment before check
 
 ## Roll back without changing the order contract
 
-Keep the previous worker deployed during the cutover. To roll back, route order jobs to that worker and restore its credential; callers keep sending the same domain payload. The stable per-tool keys stay attached to the order ID, which lets downstream adapters recognize already-applied writes during the switch. Once the observation window closes, retire the previous route and credential.
+Keep the previous worker deployed during the cutover. To roll back, route order jobs to that worker and restore its credential; callers continue sending the same domain payload. The stable per-tool keys remain attached to the order ID, which lets downstream adapters recognize already-applied writes during the switch. Once the observation window closes, retire the previous route and credential.
 
 ## License
 
